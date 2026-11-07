@@ -1,8 +1,5 @@
 # Credit Card Default Prediction — ML Assignment 2
 
-> **Before you submit:** replace every `<...>` placeholder, check every number against
-> the table printed by `python train_models.py`, and rewrite the observations in your own words.
-
 ## a. Problem statement
 
 Banks lose money when credit-card customers stop paying. The goal of this project is to
@@ -38,7 +35,7 @@ pipeline for Logistic Regression, KNN, Naive Bayes and SVM; the Decision Tree us
 
 ## c. GitHub repository link
 
-<paste your repo link, e.g. https://github.com/your-username/credit-default-ml>
+https://github.com/pawarsunny/ML-Assignment-2.git
 
 Live Streamlit app: <paste your app link, e.g. https://your-app-name.streamlit.app>
 

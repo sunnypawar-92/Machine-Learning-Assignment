@@ -128,6 +128,29 @@ st.caption(
     "(UCI dataset, 23 features). Upload test data, pick a model, read the results."
 )
 
+with st.expander("ℹ️ About this app", expanded=True):
+    st.markdown(
+        """
+**Purpose.** This app predicts whether a credit-card customer will **default on next
+month's payment** and lets you evaluate how well five machine-learning models do it.
+
+**How it works**
+1. **Upload** a CSV containing the 23 customer features (credit limit, demographics,
+   6 months of repayment status, bill amounts and payment amounts) plus the true
+   `default` label (1 = defaulted, 0 = paid).
+2. **Choose** one of five pre-trained models: Logistic Regression, Decision Tree,
+   KNN, Naive Bayes or SVM. Models were trained offline with `train_models.py`;
+   nothing is retrained here.
+3. **Review** the results: six metrics (Accuracy, AUC, Precision, Recall, F1, MCC),
+   a confusion matrix, a per-class report and a comparison of all five models.
+4. **Download** the predictions for every row and the model comparison table as CSV.
+
+**Reading the metrics.** Defaulters are a minority class, so Accuracy alone can be
+misleading. **F1** and **MCC** give a fairer picture of how well a model catches
+defaulters without raising too many false alarms.
+        """
+    )
+
 # ----- Sidebar: inputs -----------------------------------------------------
 with st.sidebar:
     st.header("1 · Upload test data")
@@ -212,7 +235,9 @@ for col, (name, value) in zip(cols, metrics.items()):
 left, right = st.columns([1, 1.2])
 with left:
     st.markdown("**Confusion matrix**")
-    st.pyplot(plot_confusion_matrix(y_test, y_pred, chosen))
+    cm_fig = plot_confusion_matrix(y_test, y_pred, chosen)
+    st.pyplot(cm_fig)
+    plt.close(cm_fig)  # free memory; Streamlit reruns the script on every interaction
 with right:
     st.markdown("**Classification report**")
     report = classification_report(
@@ -224,17 +249,26 @@ with right:
 # ---------------------------------------------------------------------------
 # 6. All five models side by side on the same uploaded data
 # ---------------------------------------------------------------------------
+st.divider()
 st.subheader("All models on this test data")
 
 rows = []
-for name in MODEL_FILES:
-    _, _, m = run_model(load_model(name), X_test, y_test)
-    rows.append({"Model": name, **m})
+with st.spinner("Scoring all models..."):
+    for name in MODEL_FILES:
+        # Reuse the chosen model's metrics instead of predicting twice
+        m = metrics if name == chosen else run_model(load_model(name), X_test, y_test)[2]
+        rows.append({"Model": name, **m})
 comparison = pd.DataFrame(rows).set_index("Model").round(4)
 
 # Highlight the best score in each column so the winner stands out
 styled = comparison.style.highlight_max(axis=0, color="#cfe8ff").format("{:.4f}")
 st.dataframe(styled, width="stretch")
+st.download_button(
+    "⬇️ Download model comparison (CSV)",
+    comparison.to_csv().encode("utf-8"),
+    file_name="model_comparison.csv",
+    mime="text/csv",
+)
 
 # Bar chart of F1 and MCC - the two metrics that matter most with imbalanced classes.
 # Drawn with matplotlib (not st.bar_chart) because st.bar_chart relies on the
@@ -249,12 +283,32 @@ ax.set_title("F1 and MCC by model", fontsize=10)
 ax.legend(loc="upper right", fontsize=8)
 fig.tight_layout()
 st.pyplot(fig)
+plt.close(fig)
 
 # ---------------------------------------------------------------------------
-# 7. Peek at individual predictions
+# 7. Individual predictions + download
 # ---------------------------------------------------------------------------
+st.divider()
+st.subheader(f"Predictions — {chosen}")
+
+results = test_df.copy()
+results["predicted"] = y_pred
+results["prob_default"] = y_score.round(4)
+results["correct"] = (results["predicted"] == results[TARGET_COL]).astype(int)
+
+st.download_button(
+    f"⬇️ Download all {len(results):,} predictions (CSV)",
+    results.to_csv(index=False).encode("utf-8"),
+    file_name=f"predictions_{MODEL_FILES[chosen].removesuffix('.pkl')}.csv",
+    mime="text/csv",
+    type="primary",
+)
+
 with st.expander("See the first 20 predictions"):
-    preview = test_df.head(20).copy()
-    preview["predicted"] = y_pred[:20]
-    preview["prob_default"] = y_score[:20].round(3)
-    st.dataframe(preview, width="stretch")
+    st.dataframe(results.head(20), width="stretch")
+
+st.divider()
+st.caption(
+    "ML Assignment 2 · Credit Card Default Prediction · "
+    "Data: UCI *Default of Credit Card Clients* (Taiwan, 2005)"
+)
