@@ -1,0 +1,9 @@
+# Virtual environment folder - never upload this to GitHub
+venv/
+.venv/
+# Python cache files
+__pycache__/
+*.pyc
+# Editor and OS clutter
+.vscode/
+.DS_Store

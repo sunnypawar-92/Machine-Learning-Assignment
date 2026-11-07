@@ -1,0 +1,7 @@
+# Custom look for the app (makes it different from the default template)
+[theme]
+primaryColor = "#0078D6"          # buttons, sliders, highlights
+backgroundColor = "#FFFFFF"       # main page
+secondaryBackgroundColor = "#EEF5FB"  # sidebar and widgets
+textColor = "#1A1A1A"
+font = "sans serif"
