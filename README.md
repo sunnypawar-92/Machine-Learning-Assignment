@@ -35,9 +35,9 @@ pipeline for Logistic Regression, KNN, Naive Bayes and SVM; the Decision Tree us
 
 ## c. GitHub repository link
 
-https://github.com/pawarsunny/ML-Assignment-2.git
+https://github.com/sunnypawar-92/Machine-Learning-Assignment
 
-Live Streamlit app: <paste your app link, e.g. https://your-app-name.streamlit.app>
+Live Streamlit app: https://ajhjhpnrdkyxmmqjtmy3ek.streamlit.app/
 
 **Repository structure**
 
