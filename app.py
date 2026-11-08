@@ -6,26 +6,27 @@ Streamlit web app for ML Assignment 2 - Credit Card Default Prediction.
 What the app does:
     1. Lets the user upload a test CSV (features + 'default' target column).
     2. Lets the user pick one of the 5 saved models from a dropdown.
-    3. Loads that already-trained model from the model/ folder
-       (NO retraining happens here - the assignment requires this).
-    4. Shows the 6 evaluation metrics, a confusion matrix and a
-       classification report for the chosen model.
-    5. Shows a comparison table of all 5 models on the uploaded data.
+    3. Loads the selected already-trained model from the model/ folder.
+    4. Runs predictions on the uploaded dataset.
+    5. Displays evaluation metrics, confusion matrix, and classification report.
+    6. Compares all 5 models on the same uploaded test dataset.
+    7. Allows downloading predictions and model comparison results.
 
 Run locally with:
     streamlit run app.py
 """
 
 # ---------------------------------------------------------------------------
-# 1. Imports
+# Imports
 # ---------------------------------------------------------------------------
-import os
-import joblib
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-import streamlit as st
+import os   # Used for working with folders and file paths
+import joblib   # Used to load trained machine learning models saved as .pkl files
+import pandas as pd   # Used for reading, cleaning and manipulating tabular data
+import matplotlib.pyplot as plt  # Used for generating charts and visualizations
+import seaborn as sns   # Provides attractive statistical plots (used for confusion matrix)
+import streamlit as st  # Streamlit is used to build the interactive web application
 
+# Machine Learning evaluation metrics
 from sklearn.metrics import (
     accuracy_score,
     roc_auc_score,
@@ -38,14 +39,19 @@ from sklearn.metrics import (
 )
 
 # ---------------------------------------------------------------------------
-# 2. Settings
+# Settings
 # ---------------------------------------------------------------------------
-# BASE_DIR = the folder this app.py file lives in. Building every path from it
-# means the app finds its files no matter which folder you start Streamlit from.
+# __file__ refers to the current app.py file.
+# BASE_DIR becomes the folder where app.py exists.
+# Using BASE_DIR makes file paths work correctly even if the app is launched from a different location.
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-MODEL_DIR = os.path.join(BASE_DIR, "model")
-SAMPLE_CSV = os.path.join(BASE_DIR, "test_data.csv")
-TARGET_COL = "default"
+
+MODEL_DIR = os.path.join(BASE_DIR, "model")  # Folder that contains the trained models (.pkl files)
+
+SAMPLE_CSV = os.path.join(BASE_DIR, "test_data.csv")  # # Optional sample dataset users can download and test quickly
+
+TARGET_COL = "default"  # Name of the target column used during training
 
 # Dropdown label -> file name inside model/
 MODEL_FILES = {
@@ -56,7 +62,8 @@ MODEL_FILES = {
     "SVM": "svm.pkl",
 }
 
-# The 23 input columns the models were trained on, in the same order.
+# These are the exact 23 feature columns used when training the models.
+# Keeping the same order is extremely important because machine learning models expect features in the same order used during training.
 FEATURE_COLS = (
     ["LIMIT_BAL", "SEX", "EDUCATION", "MARRIAGE", "AGE"]
     + ["PAY_0", "PAY_2", "PAY_3", "PAY_4", "PAY_5", "PAY_6"]
@@ -66,7 +73,7 @@ FEATURE_COLS = (
 
 
 # ---------------------------------------------------------------------------
-# 3. Helper functions
+# Helper functions
 # ---------------------------------------------------------------------------
 @st.cache_resource  # load each model from disk only once, then reuse it
 def load_model(model_name):
@@ -76,9 +83,31 @@ def load_model(model_name):
 
 
 def compute_metrics(y_true, y_pred, y_score):
-    """Return the 6 assignment metrics as a dictionary."""
-    # AUC needs both classes (0 and 1) present in the uploaded data.
-    # If a tiny upload has only one class, show "n/a" instead of crashing.
+
+    """
+    Calculate all performance metrics required for the assignment.
+
+    Parameters
+    ----------
+    y_true  : Actual labels from uploaded dataset
+    y_pred  : Predicted class labels (0 or 1)
+    y_score : Probability scores for class 1
+
+    Returns
+    -------
+    Dictionary containing:
+        Accuracy
+        AUC
+        Precision
+        Recall
+        F1 Score
+        MCC
+    """
+    # ROC-AUC cannot be calculated when the uploaded dataset
+    # contains only one class.
+    # Example:
+    # If every row is class 0, ROC-AUC becomes undefined.
+
     try:
         auc = roc_auc_score(y_true, y_score)
     except ValueError:
@@ -95,9 +124,17 @@ def compute_metrics(y_true, y_pred, y_score):
 
 
 def run_model(model, X, y):
-    """Predict with a saved model and return (predictions, scores, metrics)."""
-    y_pred = model.predict(X)                 # class labels 0/1
-    y_score = model.predict_proba(X)[:, 1]    # probability of default
+    
+    """
+    Execute prediction using a selected trained model.
+
+    Returns:
+        y_pred   -> predicted labels (0/1)
+        y_score  -> probability of default
+        metrics  -> assignment evaluation metrics
+    """
+    y_pred = model.predict(X)                 # Predict final class labels (0/1)
+    y_score = model.predict_proba(X)[:, 1]    # Get probability for positive class (Default = 1)
     return y_pred, y_score, compute_metrics(y, y_pred, y_score)
 
 
@@ -118,16 +155,22 @@ def plot_confusion_matrix(y_true, y_pred, title):
 
 
 # ---------------------------------------------------------------------------
-# 4. Page layout
+# Page layout
 # ---------------------------------------------------------------------------
+
+# Configure browser tab title, icon and layout width
 st.set_page_config(page_title="Credit Default Model Lab", page_icon="💳", layout="wide")
 
+# Main page heading
 st.title("💳 Credit Card Default — Model Lab")
+
+# Small description below title
 st.caption(
     "Compare five pre-trained classifiers on Taiwan credit-card customers "
     "(UCI dataset, 23 features). Upload test data, pick a model, read the results."
 )
 
+# Expandable information section
 with st.expander("ℹ️ About this app", expanded=True):
     st.markdown(
         """
@@ -151,8 +194,12 @@ defaulters without raising too many false alarms.
         """
     )
 
-# ----- Sidebar: inputs -----------------------------------------------------
+# ---------------------------------------------------------------------------
+# Sidebar Section
+# ---------------------------------------------------------------------------
 with st.sidebar:
+
+    # Upload dataset
     st.header("1 - Upload test data")
     uploaded = st.file_uploader("CSV with the 23 features + 'default' column", type="csv")
 
@@ -161,6 +208,7 @@ with st.sidebar:
         with open(SAMPLE_CSV, "rb") as f:
             st.download_button("Download sample test_data.csv", f, file_name="test_data.csv")
 
+    # Model selection
     st.header("2 - Choose a model")
     chosen = st.selectbox("Model", list(MODEL_FILES.keys()))
 
@@ -170,11 +218,15 @@ with st.sidebar:
         "Models were trained once offline (`train_models.py`); this app only loads them."
     )
 
-# ----- Stop early if the trained models are not there ----------------------
-# The models are created by train_models.py. If they are missing, explain how
-# to fix it instead of showing a confusing "No such file" error.
+# ---------------------------------------------------------------------------
+# Check Whether Trained Models Exist
+# ---------------------------------------------------------------------------
+
+# Search for missing model files
 missing_models = [f for f in MODEL_FILES.values()
                   if not os.path.exists(os.path.join(MODEL_DIR, f))]
+
+# If any trained model file is missing, stop execution and explain the issue
 if missing_models:
     st.error(
         f"Trained model files not found in `{MODEL_DIR}`: {missing_models}  \n"
@@ -184,27 +236,32 @@ if missing_models:
     )
     st.stop()
 
-# ----- Stop early until a file is uploaded ---------------------------------
+# ---------------------------------------------------------------------------
+# Wait Until User Uploads File
+# ---------------------------------------------------------------------------
+
 if uploaded is None:
     st.info("⬅️ Upload a test CSV in the sidebar to begin. "
             "No file? Use **Download sample test_data.csv** first.")
     st.stop()
 
-# ----- Read and check the uploaded file ------------------------------------
-# sep=None + engine="python" lets pandas detect the separator itself
-# (Excel in some regions saves CSVs with ';' instead of ',').
-# encoding="utf-8-sig" removes an invisible "BOM" character Excel may add.
+# ---------------------------------------------------------------------------
+# Read Uploaded Dataset
+# ---------------------------------------------------------------------------
+
+# Automatically detect delimiter and handle UTF-8 BOM issues
 test_df = pd.read_csv(uploaded, sep=None, engine="python", encoding="utf-8-sig")
 
 # Remove stray spaces around column names, e.g. "default " -> "default"
 test_df.columns = test_df.columns.str.strip()
 
-# Accept the target column under its original UCI or Kaggle names too
+# Accept alternative dataset column names
 test_df = test_df.rename(columns={
     "default payment next month": TARGET_COL,   # original UCI name
     "default.payment.next.month": TARGET_COL,   # Kaggle CSV name
 })
 
+# Ensure all required columns exist
 missing = [c for c in FEATURE_COLS + [TARGET_COL] if c not in test_df.columns]
 if missing:
     st.error(f"The uploaded file is missing these columns: {missing}")
@@ -212,22 +269,28 @@ if missing:
     st.write("Columns found in your file:", list(test_df.columns))
     st.stop()
 
+# Extract features only
 X_test = test_df[FEATURE_COLS]   # keep only the 23 features, in training order
+
+# Extract true labels
 y_test = test_df[TARGET_COL]
 
+# Display basic dataset information
 st.success(f"Loaded {len(test_df):,} rows. "
            f"Defaulters in this file: {y_test.mean():.1%}")
 
 # ---------------------------------------------------------------------------
-# 5. Results for the chosen model
+# Results for the chosen model
 # ---------------------------------------------------------------------------
-model = load_model(chosen)
-y_pred, y_score, metrics = run_model(model, X_test, y_test)
 
-st.subheader(f"Results — {chosen}")
+model = load_model(chosen) # Load chosen model
+y_pred, y_score, metrics = run_model(model, X_test, y_test)  # Generate predictions and metrics
 
-# Six metric tiles in one row
-cols = st.columns(6)
+st.subheader(f"Results — {chosen}") 
+
+
+cols = st.columns(6) # Six metric tiles in one row
+
 for col, (name, value) in zip(cols, metrics.items()):
     col.metric(name, "n/a" if pd.isna(value) else f"{value:.3f}")
 
@@ -240,6 +303,7 @@ with left:
     plt.close(cm_fig)  # free memory; Streamlit reruns the script on every interaction
 with right:
     st.markdown("**Classification report**")
+    # Generate detailed precision, recall and F1 statistics
     report = classification_report(
         y_test, y_pred, target_names=["No default (0)", "Default (1)"],
         output_dict=True, zero_division=0,
@@ -247,7 +311,7 @@ with right:
     st.dataframe(pd.DataFrame(report).T.round(3), width="stretch")
 
 # ---------------------------------------------------------------------------
-# 6. All five models side by side on the same uploaded data
+# Compare All Models on the Same Test Data
 # ---------------------------------------------------------------------------
 st.divider()
 st.subheader("All models on this test data")
@@ -263,6 +327,7 @@ comparison = pd.DataFrame(rows).set_index("Model").round(4)
 # Highlight the best score in each column so the winner stands out
 styled = comparison.style.highlight_max(axis=0, color="#cfe8ff").format("{:.4f}")
 st.dataframe(styled, width="stretch")
+# Allow downloading comparison table
 st.download_button(
     "⬇️ Download model comparison (CSV)",
     comparison.to_csv().encode("utf-8"),
@@ -270,10 +335,11 @@ st.download_button(
     mime="text/csv",
 )
 
-# Bar chart of F1 and MCC - the two metrics that matter most with imbalanced classes.
-# Drawn with matplotlib (not st.bar_chart) because st.bar_chart relies on the
-# altair library, whose version 5.5 crashes on Python 3.14 with
-# "TypeError: _TypedDictMeta.__new__() got an unexpected keyword argument 'closed'".
+# ---------------------------------------------------------------------------
+# Visual Comparison Chart
+# ---------------------------------------------------------------------------
+
+# F1 and MCC are often more useful for imbalanced datasets
 fig, ax = plt.subplots(figsize=(7, 3))
 comparison[["F1", "MCC"]].plot.bar(ax=ax, rot=0, color=["#0078D6", "#7B30E5"])
 ax.set_ylabel("Score")
@@ -286,16 +352,25 @@ st.pyplot(fig)
 plt.close(fig)
 
 # ---------------------------------------------------------------------------
-# 7. Individual predictions + download
+# Individual predictions + download
 # ---------------------------------------------------------------------------
 st.divider()
 st.subheader(f"Predictions — {chosen}")
 
+# Create copy of original dataset
 results = test_df.copy()
+
+# Store prediction results
 results["predicted"] = y_pred
+
+# Store probability scores
 results["prob_default"] = y_score.round(4)
+
+# 1 = Correct prediction
+# 0 = Incorrect prediction
 results["correct"] = (results["predicted"] == results[TARGET_COL]).astype(int)
 
+# Download prediction results
 st.download_button(
     f"⬇️ Download all {len(results):,} predictions (CSV)",
     results.to_csv(index=False).encode("utf-8"),
@@ -304,9 +379,14 @@ st.download_button(
     type="primary",
 )
 
+# Show first few prediction rows
 with st.expander("See the first 20 predictions"):
     st.dataframe(results.head(20), width="stretch")
 
+
+# ---------------------------------------------------------------------------
+# Footer
+# ---------------------------------------------------------------------------
 st.divider()
 st.caption(
     "ML Assignment 2 · Credit Card Default Prediction · "
