@@ -84,10 +84,8 @@ K-Nearest Neighbours (k=15), Gaussian Naive Bayes, and Support Vector Machine (R
 
 ## How to run locally
 
-```bash
-python -m venv venv
-venv\Scripts\activate            # Windows  (macOS/Linux: source venv/bin/activate)
+```
 pip install -r requirements.txt
-python train_models.py           # retrains and re-saves the models (optional)
+python train_models.py          # retrains and re-saves the models (optional)
 streamlit run app.py
 ```
