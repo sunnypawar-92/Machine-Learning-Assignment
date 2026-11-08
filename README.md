@@ -2,7 +2,7 @@
 
 **M.Tech (AIML) · Machine Learning · BITS Pilani WILP**
 
-**Student:** Sunny Pawar | **BITS ID:** 2026K05098
+**Name:** Sunny Pawar | **BITS ID:** 2026K05098
 
 **GitHub repository:** https://github.com/sunnypawar-92/Machine-Learning-Assignment
 
@@ -118,7 +118,7 @@ All five classifiers were trained on the same 24,000 training rows and evaluated
 Logistic Regression
 Decision Tree
 K-Nearest Neighbors (KNN)
-Naïve Bayes
+Naive Bayes
 Support Vector Machine (SVM)
 ```
 
@@ -135,7 +135,7 @@ Matthews Correlation Coefficient (MCC)
 
 **4. Confusion matrix and classification report -** The app displays a confusion matrix heatmap and a detailed classification report showing Precision, Recall, F1-Score, Support, Accuracy, Macro Average and Weighted Average values.
 
-**Additional Features**
+### Additional Features
 
 **5. Sample test dataset download -** A sample test_data.csv file can be downloaded for quick testing of the application.
 
