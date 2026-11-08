@@ -65,7 +65,7 @@ Machine-Learning-Assignment/
 ├── README.md                     # this file
 ├── app.py                        # Streamlit app: upload CSV, pick model, view metrics
 ├── requirements.txt              # pinned library versions for deployment
-├── test_data.csv                 # 20% stratified hold-out set (6,000 rows) - upload this in 
+├── test_data.csv                 # 20% stratified hold-out set (6,000 rows) - upload this in the app
 └── train_models.py               # trains the 5 models, prints metrics, saves .pkl files
 ```
 
