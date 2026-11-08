@@ -310,6 +310,29 @@ with right:
     )
     st.dataframe(pd.DataFrame(report).T.round(3), width="stretch")
 
+with st.expander("📖 How to Interpret the Results"):
+    st.markdown("""
+    #### Confusion Matrix
+    The confusion matrix summarizes the model's predictions:
+
+    - True Negatives (TN): Correctly predicted non-defaulters.
+    - False Positives (FP): Predicted default but actually did not default.
+    - False Negatives (FN): Missed actual defaulters.
+    - True Positives (TP): Correctly identified defaulters.
+
+    A good model should maximize TN and TP while minimizing FP and FN.
+
+    #### Classification Report
+
+    - Precision: How reliable positive predictions are.
+    - Recall: How many actual positives are detected.
+    - F1-score: Balance between Precision and Recall.
+    - Support: Number of samples belonging to each class.
+
+    Accuracy, Macro Average, and Weighted Average provide overall model performance summaries.
+
+    For credit default prediction, Recall, F1-score, and MCC are particularly important because identifying potential defaulters is often more valuable than maximizing overall accuracy.
+    """)
 # ---------------------------------------------------------------------------
 # Compare All Models on the Same Test Data
 # ---------------------------------------------------------------------------
@@ -327,6 +350,21 @@ comparison = pd.DataFrame(rows).set_index("Model").round(4)
 # Highlight the best score in each column so the winner stands out
 styled = comparison.style.highlight_max(axis=0, color="#cfe8ff").format("{:.4f}")
 st.dataframe(styled, width="stretch")
+
+with st.expander("📊 Understanding the Model Comparison Table"):
+    st.markdown("""
+    **Blue highlighted cells** show the **highest score in each metric column**.
+
+    - **Accuracy**: Overall percentage of correct predictions.
+    - **AUC**: Ability to distinguish between defaulters and non-defaulters.
+    - **Precision**: Out of all customers predicted as defaulters, how many actually defaulted.
+    - **Recall**: Out of all actual defaulters, how many were correctly identified.
+    - **F1**: Balance between Precision and Recall.
+    - **MCC**: A balanced metric that considers all parts of the confusion matrix and is especially useful for imbalanced datasets.
+
+    **Note:** A model may not have blue cells in every column. Different models can excel in different aspects of prediction performance.
+    """)
+
 # Allow downloading comparison table
 st.download_button(
     "⬇️ Download model comparison (CSV)",
@@ -350,6 +388,24 @@ ax.legend(loc="upper right", fontsize=8)
 fig.tight_layout()
 st.pyplot(fig)
 plt.close(fig)
+
+with st.expander("📊 Understanding the F1 and MCC Comparison"):
+    st.markdown("""
+    This chart compares the **F1-score** and **Matthews Correlation Coefficient (MCC)**
+    achieved by each model on the uploaded test dataset.
+
+    - **F1-score** measures the balance between Precision and Recall.
+    - **MCC** evaluates the overall quality of classification by considering
+      True Positives, True Negatives, False Positives, and False Negatives.
+    - Higher values indicate better model performance.
+    - These metrics are particularly useful for **imbalanced datasets** such as
+      credit default prediction, where non-default customers significantly
+      outnumber default customers.
+
+    **Interpretation:** Models with taller bars generally provide more reliable
+    default predictions. While Accuracy can sometimes be misleading in imbalanced
+    datasets, F1-score and MCC offer a more balanced evaluation of model performance.
+    """)
 
 # ---------------------------------------------------------------------------
 # Individual predictions + download
