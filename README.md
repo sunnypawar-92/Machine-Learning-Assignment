@@ -1,12 +1,12 @@
 # Credit Card Default Prediction — ML Assignment 2
 
-M.Tech (AIML) · Machine Learning · BITS Pilani WILP
+**M.Tech (AIML) · Machine Learning · BITS Pilani WILP**
 
-Student: Sunny Pawar | BITS ID: 2026K05098
+**Student:** Sunny Pawar | **BITS ID:** 2026K05098
 
-GitHub repository: https://github.com/sunnypawar-92/Machine-Learning-Assignment
+**GitHub repository:** https://github.com/sunnypawar-92/Machine-Learning-Assignment
 
-Live Streamlit app: https://credit-default-sunnypawar.streamlit.app/
+**Live Streamlit app:** https://credit-default-sunnypawar.streamlit.app/
 
 ## a. Problem statement
 
@@ -73,11 +73,19 @@ Machine-Learning-Assignment/
 
 ## d. Models used
 
-Five classifiers, all trained on the same 24,000 training rows and evaluated on the same
-6,000 test rows: Logistic Regression, Decision Tree (max_depth=6, min_samples_leaf=20),
-K-Nearest Neighbours (k=15), Gaussian Naive Bayes, and Support Vector Machine (RBF kernel).
+All five classifiers were trained on the same 24,000 training rows and evaluated on the same 6,000 test rows (80/20 stratified split, `random_state=42`).
 
-### Comparison table (test set, 6,000 rows)
+| Model | Preprocessing | Hyper-parameters used | Why these values |
+|---|---|---|---|
+| Logistic Regression | StandardScaler | `max_iter=1000`, `C=1.0` (default), `penalty='l2'` (default), `solver='lbfgs'` (default) | `max_iter` raised from 100 so the solver converges on scaled data |
+| Decision Tree | None (trees do not need scaling) | `max_depth=6`, `min_samples_leaf=20`, `criterion='gini'` (default) | Depth and leaf-size limits stop the tree from memorising noise (overfitting) |
+| K-Nearest Neighbours | StandardScaler | `n_neighbors=15`, `weights='uniform'` (default), Euclidean distance (default) | k = 15 smooths out noisy neighbours compared with the default k = 5 |
+| Gaussian Naive Bayes | StandardScaler | `var_smoothing=1e-9` (default) | No key hyper-parameters; defaults used |
+| Support Vector Machine | StandardScaler | `kernel='rbf'`, `C=1.0` (default), `gamma='scale'` (default), `probability=True` | RBF kernel allows non-linear boundaries; `probability=True` is needed to calculate AUC |
+
+*Hyper-parameters were chosen manually from the reasoning above, not by an automated search such as GridSearchCV. `random_state=42` is fixed for every model that uses randomness, so results are reproducible.*
+
+### Model Comparison table (test set, 6,000 rows)
 
 | ML Model Name | Accuracy | AUC | Precision | Recall | F1 | MCC |
 |---|---|---|---|---|---|---|
@@ -101,7 +109,52 @@ K-Nearest Neighbours (k=15), Gaussian Naive Bayes, and Support Vector Machine (R
 | Support Vector Machine | Nearly ties the Decision Tree on accuracy (0.8165) and MCC (0.3809), but has a lower AUC (0.7210) and took by far the longest to train (~80 s vs under 1 s for the others). The extra cost buys no gain on this dataset. |
 | **Overall, winner for this dataset?** | **Decision Tree** — top accuracy, AUC and MCC, it trains fast, and its rules are easy to explain to a credit team. If the business priority is catching as many defaulters as possible (recall), Naive Bayes is the better pick despite lower accuracy. |
 
-## How to run locally
+## e. Streamlit App Features
+**1. Dataset upload (CSV) -** Users can upload a test dataset containing the 23 input features and the target column (default). The app validates the uploaded file and checks for missing columns.
+
+**2. Model selection dropdown -** Users can select one of the five pre-trained machine learning models:
+
+*Logistic Regression*
+*Decision Tree*
+*K-Nearest Neighbors (KNN)*
+*Naïve Bayes*
+*Support Vector Machine (SVM)*
+
+**3. Evaluation metrics display -** The selected model is evaluated using six performance metrics displayed as metric cards:
+
+*Accuracy*
+*AUC*
+*Precision*
+*Recall*
+*F1-Score*
+*Matthews Correlation Coefficient (MCC)*
+
+**4. Confusion matrix and classification report -** The app displays a confusion matrix heatmap and a detailed classification report showing Precision, Recall, F1-Score, Support, Accuracy, Macro Average and Weighted Average values.
+
+**Additional Features**
+
+**5. Sample test dataset download -** A sample test_data.csv file can be downloaded for quick testing of the application.
+
+**6. Dataset summary -** Displays the number of uploaded records and the percentage of defaulting customers in the test dataset.
+
+**7. Model comparison table -** All five models are evaluated on the uploaded dataset and compared side-by-side using the six evaluation metrics.
+
+**8. Best performance highlighting -** The highest value in each metric column is highlighted, making it easier to identify the best-performing model for each evaluation criterion.
+
+**9. F1 and MCC comparison chart -** A bar chart visually compares F1-Score and MCC across all five models.
+
+**10. Prediction results table -** Displays the predicted class, probability of default, and prediction correctness for each record.
+
+**11. Results download -** Users can download:
+
+*Model comparison results as a CSV file.*
+*Individual prediction results as a CSV file.*
+
+**12. Interactive explanations -** Expandable sections provide guidance on interpreting performance metrics, confusion matrices, classification reports, and model comparison results.
+
+**Note:** The application only loads pre-trained models stored in the model/ folder and performs prediction on uploaded test data. No model retraining is performed within the Streamlit application.
+
+## f. How to run locally
 
 ```
 pip install -r requirements.txt
