@@ -64,7 +64,7 @@ K-Nearest Neighbours (k=15), Gaussian Naive Bayes, and Support Vector Machine (R
 |---|---|---|---|---|---|---|
 | Logistic Regression | 0.8077 | 0.7076 | 0.6868 | 0.2396 | 0.3553 | 0.3244 |
 | Decision Tree | 0.8165 | 0.7479 | 0.6677 | 0.3391 | 0.4498 | 0.3827 |
-| KNN | 0.8065 | 0.7327 | 0.6153 | 0.3338 | 0.4328 | 0.3507 |
+| KNN | 0.8065 | 0.7328 | 0.6153 | 0.3338 | 0.4328 | 0.3507 |
 | Naive Bayes | 0.7525 | 0.7249 | 0.4515 | 0.5539 | 0.4975 | 0.3386 |
 | Support Vector Machine | 0.8160 | 0.7210 | 0.6652 | 0.3384 | 0.4486 | 0.3809 |
 
@@ -75,11 +75,11 @@ K-Nearest Neighbours (k=15), Gaussian Naive Bayes, and Support Vector Machine (R
 
 | ML Model Name | Observation about model performance |
 |---|---|
-| Logistic Regression | Highest precision (0.687) but lowest recall (0.240): when it flags a defaulter it is usually right, but it misses about 3 in 4 actual defaulters. Its straight-line decision boundary cannot capture the non-linear effect of payment delays, so it has the lowest F1 (0.355) and MCC (0.324). |
-| Decision Tree | Best accuracy (0.8165), AUC (0.748) and MCC (0.383). Its rules lean heavily on recent repayment status (`PAY_0` alone carries about 66% of feature importance), which matches how default really happens. Limiting depth to 6 kept it from overfitting. |
-| KNN | Middle of the pack (accuracy 0.807, MCC 0.351). It needs scaled features to work and keeps all 24,000 training rows in memory, so its model file is the largest after SVM and predictions are slower. Recall stays low because defaulters are a minority among the 15 nearest neighbours. |
-| Naive Bayes | Lowest accuracy (0.753) but highest recall (0.554) and highest F1 (0.498): it catches the most defaulters at the cost of more false alarms. Its independence assumption is violated here (the six `BILL_AMT` columns correlate 0.80–0.95), which skews its probabilities. |
-| Support Vector Machine | Nearly ties the Decision Tree on accuracy (0.816) and MCC (0.381), but has a lower AUC (0.721) and took by far the longest to train (~80 s vs under 1 s for the others). The extra cost buys no gain on this dataset. |
+| Logistic Regression | Highest precision (0.6868) but lowest recall (0.2396): when it flags a defaulter it is usually right, but it misses about 3 in 4 actual defaulters. Its straight-line decision boundary cannot capture the non-linear effect of payment delays, so it has the lowest F1 (0.3553) and MCC (0.3244). |
+| Decision Tree | Best accuracy (0.8165), AUC (0.7479) and MCC (0.3827). Its rules lean heavily on recent repayment status (`PAY_0` alone carries about 66% of feature importance), which matches how default really happens. Limiting depth to 6 kept it from overfitting. |
+| KNN | Middle of the pack (accuracy 0.8065, MCC 0.3507). It needs scaled features to work and keeps all 24,000 training rows in memory, so its model file is the largest after SVM and predictions are slower. Recall stays low because defaulters are a minority among the 15 nearest neighbours. |
+| Naive Bayes | Lowest accuracy (0.7525) but highest recall (0.5539) and highest F1 (0.4975): it catches the most defaulters at the cost of more false alarms. Its independence assumption is violated here (the six `BILL_AMT` columns correlate 0.80–0.95), which skews its probabilities. |
+| Support Vector Machine | Nearly ties the Decision Tree on accuracy (0.8165) and MCC (0.3809), but has a lower AUC (0.7210) and took by far the longest to train (~80 s vs under 1 s for the others). The extra cost buys no gain on this dataset. |
 | **Overall, winner for this dataset?** | **Decision Tree** — top accuracy, AUC and MCC, it trains fast, and its rules are easy to explain to a credit team. If the business priority is catching as many defaulters as possible (recall), Naive Bayes is the better pick despite lower accuracy. |
 
 ## How to run locally
