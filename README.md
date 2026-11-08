@@ -1,5 +1,13 @@
 # Credit Card Default Prediction — ML Assignment 2
 
+M.Tech (AIML) · Machine Learning · BITS Pilani WILP
+
+Student: Sunny Pawar | BITS ID: 2026K05098
+
+GitHub repository: https://github.com/sunnypawar-92/Machine-Learning-Assignment
+
+Live Streamlit app: https://credit-default-sunnypawar.streamlit.app/
+
 ## a. Problem statement
 
 Banks lose money when credit-card customers stop paying. The goal of this project is to
@@ -37,20 +45,31 @@ pipeline for Logistic Regression, KNN, Naive Bayes and SVM; the Decision Tree us
 
 https://github.com/sunnypawar-92/Machine-Learning-Assignment
 
-Live Streamlit app: https://credit-default-sunnypawar.streamlit.app/
 
 **Repository structure**
 
 ```
-├── app.py                  # Streamlit app (loads saved models, no retraining)
-├── train_models.py         # trains the 5 models, prints metrics, saves .pkl files
-├── requirements.txt        # pinned library versions
-├── README.md
-├── test_data.csv           # 20% hold-out test set (upload this in the app)
-├── data/                   # raw UCI .xls file
-├── model/                  # 5 trained models (.pkl) + metrics_summary.csv
-└── .streamlit/config.toml  # custom app theme
+Machine-Learning-Assignment/
+├── .streamlit/
+│   └── config.toml               # custom app theme (colours, font)
+├── data/
+│   └── default of credit card clients.xls   # raw UCI dataset (30,000 rows, 23 features)
+├── model/                        # saved trained models - loaded by the app, never retrained
+│   ├── logistic_regression.pkl
+│   ├── decision_tree.pkl
+│   ├── knn.pkl
+│   ├── naive_bayes.pkl
+│   ├── svm.pkl
+│   └── metrics_summary.csv       # test-set metrics for all 5 models
+├── .gitignore                    # keeps venv/ and cache files out of the repo
+├── README.md                     # this file
+├── app.py                        # Streamlit app: upload CSV, pick model, view metrics
+├── requirements.txt              # pinned library versions for deployment
+├── test_data.csv                 # 20% stratified hold-out set (6,000 rows) - upload this in 
+└── train_models.py               # trains the 5 models, prints metrics, saves .pkl files
 ```
+
+*Preprocessing:* the `StandardScaler` is saved inside each model's pipeline (all except the Decision Tree), so no separate preprocessing file is needed.
 
 ## d. Models used
 
