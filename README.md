@@ -151,8 +151,8 @@ Matthews Correlation Coefficient (MCC)
 
 **11. Results download -** Users can download:
 
-*Model comparison results as a CSV file.*
-*Individual prediction results as a CSV file.*
+    Model comparison results as a CSV file.
+    Individual prediction results as a CSV file.
 
 **12. Interactive explanations -** Expandable sections provide guidance on interpreting performance metrics, confusion matrices, classification reports, and model comparison results.
 
