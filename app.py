@@ -199,6 +199,19 @@ defaulters without raising too many false alarms.
 # ---------------------------------------------------------------------------
 with st.sidebar:
 
+    # Project Information
+    st.markdown("## 💳 Credit Default Model Lab")
+
+    st.markdown("""
+    **Sunny Pawar**  
+    Student ID: 2026AK05098
+
+    *ML Assignment 2 - Credit Card Default Prediction*
+    """)
+
+    st.divider()
+
+
     # Upload dataset
     st.header("1 - Upload test data")
     uploaded = st.file_uploader("CSV with the 23 features + 'default' column", type="csv")
