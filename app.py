@@ -153,7 +153,7 @@ defaulters without raising too many false alarms.
 
 # ----- Sidebar: inputs -----------------------------------------------------
 with st.sidebar:
-    st.header("1 · Upload test data")
+    st.header("1 - Upload test data")
     uploaded = st.file_uploader("CSV with the 23 features + 'default' column", type="csv")
 
     # Offer the project's own test file so an evaluator can try the app fast
@@ -161,7 +161,7 @@ with st.sidebar:
         with open(SAMPLE_CSV, "rb") as f:
             st.download_button("Download sample test_data.csv", f, file_name="test_data.csv")
 
-    st.header("2 · Choose a model")
+    st.header("2 - Choose a model")
     chosen = st.selectbox("Model", list(MODEL_FILES.keys()))
 
     st.divider()
