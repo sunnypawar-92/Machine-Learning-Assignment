@@ -114,20 +114,24 @@ All five classifiers were trained on the same 24,000 training rows and evaluated
 
 **2. Model selection dropdown -** Users can select one of the five pre-trained machine learning models:
 
-*Logistic Regression*
-*Decision Tree*
-*K-Nearest Neighbors (KNN)*
-*Naïve Bayes*
-*Support Vector Machine (SVM)*
+```
+Logistic Regression
+Decision Tree
+K-Nearest Neighbors (KNN)
+Naïve Bayes
+Support Vector Machine (SVM)
+```
 
 **3. Evaluation metrics display -** The selected model is evaluated using six performance metrics displayed as metric cards:
 
-*Accuracy*
-*AUC*
-*Precision*
-*Recall*
-*F1-Score*
-*Matthews Correlation Coefficient (MCC)*
+```
+Accuracy
+AUC
+Precision
+Recall
+F1-Score
+Matthews Correlation Coefficient (MCC)
+```
 
 **4. Confusion matrix and classification report -** The app displays a confusion matrix heatmap and a detailed classification report showing Precision, Recall, F1-Score, Support, Accuracy, Macro Average and Weighted Average values.
 
