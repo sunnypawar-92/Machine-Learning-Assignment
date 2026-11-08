@@ -117,7 +117,7 @@ All five classifiers were trained on the same 24,000 training rows and evaluated
 ```
 Logistic Regression
 Decision Tree
-K-Nearest Neighbors (KNN)
+K-Nearest Neighbours (KNN)
 Naive Bayes
 Support Vector Machine (SVM)
 ```
